@@ -1,0 +1,1101 @@
+/* ─── Widgets, gráficos e a grade dos painéis ─── */
+
+/* ═══════════════ Grade ═══════════════ */
+
+.grade-widgets {
+  display: grid;
+  /* Seis colunas: terço (2), metade (3) e inteiro (6) convivem na mesma linha. */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+/* Só como filhas da grade: fora dela (`.painel`, uma coluna) `span 3` criaria colunas implícitas e encolheria os irmãos. */
+.grade-widgets > .cartao--terco   { grid-column: span 2; }
+.grade-widgets > .cartao--metade  { grid-column: span 3; }
+.grade-widgets > .cartao--inteiro { grid-column: span 6; }
+
+@media (max-width: 1100px) {
+  .grade-widgets > .cartao--terco,
+  .grade-widgets > .cartao--metade {
+    grid-column: span 6;
+  }
+}
+
+.cartao__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cartao__atalho {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+/* Nota de rodapé do cartão: explica o método ou a ressalva do número acima. */
+
+/* ═══════════════ Gráficos ═══════════════ */
+
+.gr {
+  position: relative;
+}
+
+.gr__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.gr__grade {
+  stroke: var(--grade);
+  stroke-width: 1;
+}
+
+.gr__eixo {
+  fill: var(--eixo-texto);
+  font-size: 11px;
+}
+
+.gr__referencia {
+  stroke: var(--critico);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  opacity: 0.7;
+}
+
+.gr__eixo-ref {
+  fill: var(--critico);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.gr__regua {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.55;
+}
+
+/* Anel da cor da superfície: separa marcador e linha onde as séries se cruzam. */
+.gr__marcador {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.gr__grupo--ativo rect {
+  opacity: 0.85;
+}
+
+.gr__tooltip {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+  z-index: 2;
+
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.gr__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  /* Legenda em tinta de texto, nunca na cor da série. */
+  color: var(--text-muted);
+}
+
+.gr__legenda li,
+.gr__tooltip span {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+}
+
+.gr__marca {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════ Barras horizontais ═══════════════ */
+
+.barras {
+  /* As colunas se decidem pela largura do CARTÃO (container query). */
+  container-type: inline-size;
+}
+
+.barras__linha {
+  grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr) auto auto auto;
+}
+
+.barras__valor {
+  white-space: nowrap;
+}
+
+/* Cartão estreito: nome, valor e percentuais numa linha, a barra embaixo. */
+@container (max-width: 460px) {
+  .barras__linha {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    row-gap: 0.3125rem;
+  }
+
+  .barras__categoria {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .barras__trilho {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+.barras__variacao {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.barras__variacao--alta  { color: var(--bom); }
+.barras__variacao--baixa { color: var(--critico); }
+
+/* ═══════════════ Sazonalidade ═══════════════ */
+
+.sazonal {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0.25rem;
+  align-items: end;
+}
+
+.sazonal__coluna {
+  display: grid;
+  grid-template-rows: 3.5rem 1px 3.5rem auto auto;
+  text-align: center;
+}
+
+.sazonal__area {
+  display: flex;
+}
+
+.sazonal__area--cima  { align-items: flex-end; }
+.sazonal__area--baixo { align-items: flex-start; }
+
+.sazonal__barra {
+  width: 100%;
+}
+
+.sazonal__barra--cima {
+  background: var(--serie-1);
+  border-radius: 3px 3px 0 0;
+}
+
+.sazonal__barra--baixo {
+  background: var(--serie-2);
+  border-radius: 0 0 3px 3px;
+}
+
+/* A linha do meio é a média: os desvios partem dela, não do zero. */
+.sazonal__base {
+  background: var(--border);
+}
+
+.sazonal__mes {
+  margin-top: 0.3125rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.sazonal__valor {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--bom);
+}
+
+.sazonal__valor--baixo {
+  color: var(--critico);
+}
+
+/* ═══════════════ Medidor de meta ═══════════════ */
+
+.medidor {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.medidor__topo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.medidor__percentual {
+  font-size: 1.5rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.medidor__percentual--bom     { color: var(--bom); }
+.medidor__percentual--atencao { color: var(--atencao); }
+.medidor__percentual--ruim    { color: var(--critico); }
+
+.medidor__trilho {
+  position: relative;
+  height: 0.875rem;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.medidor__preenchimento {
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  transition: inline-size 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.medidor__preenchimento--bom     { background: var(--bom); }
+.medidor__preenchimento--atencao { background: var(--atencao); }
+.medidor__preenchimento--ruim    { background: var(--critico); }
+
+.medidor__ritmo {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--text);
+  opacity: 0.5;
+}
+
+.medidor__rodape {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+}
+
+.medidor__gap { font-weight: 550; }
+.medidor__gap--bom  { color: var(--bom); }
+.medidor__gap--ruim { color: var(--critico); }
+
+/* ═══════════════ Risco de renovação ═══════════════ */
+
+.risco {
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.risco header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.risco p {
+  margin: 0.125rem 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* ═══════════════ Personalizar visão geral ═══════════════ */
+
+.personalizar {
+  display: grid;
+  grid-template-columns: 18rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 1.125rem 1.25rem;
+}
+
+.personalizar h3 {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+}
+
+.personalizar__selecionados {
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.ordem {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ordem li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 0.8125rem;
+}
+
+.ordem__posicao {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.ordem__nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ordem__acoes {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.ordem__acoes button {
+  width: 1.375rem;
+  height: 1.375rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.ordem__acoes button:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.ordem__acoes button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.ordem__acoes button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ordem__remover:hover:not(:disabled) {
+  color: var(--critico);
+}
+
+.personalizar__grupo {
+  margin-bottom: 1rem;
+}
+
+.personalizar__grupo h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0 0 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.personalizar__grupo ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.25rem;
+}
+
+.personalizar__grupo label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.personalizar__grupo label:hover {
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+.personalizar__grupo input {
+  margin-top: 0.1875rem;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.personalizar__grupo label span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.personalizar__grupo strong {
+  font-size: 0.8125rem;
+  font-weight: 550;
+}
+
+.personalizar__grupo small {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.personalizar__rodape {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.personalizar__confirmar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 860px) {
+  .personalizar {
+    grid-template-columns: 1fr;
+  }
+
+  .personalizar__selecionados {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medidor__preenchimento {
+    transition: none;
+  }
+}
+
+/* ═══════════════ Ficha do cliente ═══════════════ */
+
+.botao-cliente {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* Pontilhado: "clicável" sem competir com os links de navegação. */
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--text-muted);
+}
+
+.botao-cliente:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.botao-cliente:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.ficha-cliente__fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(8 10 14 / 45%);
+}
+
+.ficha-cliente {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 41;
+
+  display: flex;
+  flex-direction: column;
+
+  width: min(94vw, 44rem);
+
+  background: var(--surface);
+  border-inline-start: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgb(0 0 0 / 18%);
+}
+
+.ficha-cliente:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ficha-cliente {
+    animation: ficha-entra 200ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .ficha-cliente__fundo {
+    animation: fundo-entrada 200ms ease;
+  }
+}
+
+@keyframes ficha-entra {
+  from {
+    translate: 100% 0;
+  }
+}
+
+.ficha-cliente__carregando,
+.ficha-cliente__vazio {
+  padding: 2rem 1.5rem;
+  color: var(--text-muted);
+}
+
+.ficha-cliente__vazio {
+  display: grid;
+  gap: 0.875rem;
+  justify-items: start;
+}
+
+.ficha-cliente__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.375rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ficha-cliente__tipo {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.ficha-cliente__tipo + .ficha-cliente__tipo {
+  margin-left: 0.375rem;
+}
+
+/* VIP destaca (é status); o tipo de pessoa fica discreto. */
+.ficha-cliente__tipo--vip {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.ficha-cliente__topo h2 {
+  margin: 0 0 0.125rem;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+}
+
+.ficha-cliente__topo p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.ficha-cliente__fechar {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ficha-cliente__fechar:hover {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.ficha-cliente .abas {
+  padding-inline: 1.375rem;
+}
+
+.ficha-cliente__corpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.125rem 1.375rem 2rem;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+/* Rodapé fixo da gaveta, com a mesma margem lateral do corpo. */
+.ficha-cliente__rodape {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.375rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ─────────── Apólices ─────────── */
+
+.apolice {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+/* A cor da borda repete a etiqueta: quem não distingue tons lê o texto. */
+
+.apolice header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.apolice header strong {
+  font-size: 0.9375rem;
+}
+
+.apolice header p {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+/* ─────────── Linha do tempo ─────────── */
+
+.linha-tempo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+/* A linha vertical não desce do último evento (pareceria haver mais por carregar). */
+
+.linha-tempo time {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.linha-tempo p {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .ficha-cliente {
+    width: 100vw;
+  }
+}
+
+/* ─── Gaveta de detalhe — abaixo da ficha na pilha (z 30/31 × 40/41): a ficha abre POR CIMA da lista ─── */
+.detalhe__fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgb(8 10 14 / 45%);
+}
+
+.detalhe {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 31;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  width: min(96vw, 64rem);
+  padding: 1.25rem;
+  overflow-y: auto;
+
+  background: var(--surface);
+  border-inline-start: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgb(0 0 0 / 18%);
+}
+
+.detalhe:focus {
+  outline: none;
+}
+
+.detalhe__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.detalhe__topo h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.0625rem;
+  font-weight: 650;
+}
+
+.detalhe__topo p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.detalhe__estado {
+  margin: 2rem 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .detalhe {
+    animation: ficha-entra 200ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .detalhe__fundo {
+    animation: fundo-entrada 200ms ease;
+  }
+}
+
+/* ─── O que é clicável parece clicável, ANTES do clique ─── */
+.tile--clicavel {
+  display: block;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.tile--clicavel:hover {
+  border-color: var(--accent);
+}
+
+.tile--clicavel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* O cartão que é o filtro em uso. */
+.tile--ativo {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.barras__linha--clicavel {
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.barras__linha--clicavel:hover .barras__categoria,
+.barras__linha--clicavel:focus-visible .barras__categoria {
+  color: var(--accent);
+}
+
+.gr__grupo--clicavel {
+  cursor: pointer;
+}
+
+.gr__grupo--clicavel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tabela__linha--clicavel {
+  cursor: pointer;
+}
+
+.tabela__linha--clicavel:hover {
+  background: var(--surface-2, rgb(127 127 127 / 8%));
+}
+
+.tabela__linha--clicavel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Célula que abre uma lista diferente da linha. */
+.tabela__celula--clicavel {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.tabela__celula--clicavel:hover {
+  color: var(--accent);
+}
+
+.tabela__celula--clicavel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.filtros-inadimplencia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.filtros-inadimplencia .campo-form {
+  width: min(16rem, 100%);
+}
+
+.tiles[aria-busy='true'],
+.cartao[aria-busy='true'] {
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+/* ── Rosca (GraficoRosca): a rosca não encolhe; a legenda cede e corta o nome com reticências ── */
+.rosca {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.rosca__grafico {
+  flex-shrink: 0;
+}
+
+.rosca__total {
+  font-size: 5.2px;
+  font-weight: 700;
+  fill: var(--text);
+}
+
+.rosca__legenda {
+  display: grid;
+  gap: 0.1875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  min-width: 0;
+}
+
+/* Uma linha por fatia (nome · valor · %), para os cartões caberem na tela. */
+.rosca__legenda li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: 'cor nome valor pct';
+  column-gap: 0.375rem;
+  align-items: center;
+}
+
+.rosca__cor {
+  grid-area: cor;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 2px;
+}
+
+.rosca__nome {
+  grid-area: nome;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rosca__pct {
+  grid-area: pct;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rosca__valor {
+  grid-area: valor;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Fila de renovação: tabela com altura máxima e cabeçalho fixo ─── */
+.fila-renovacao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.fila-renovacao__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.fila-renovacao__barra > p {
+  margin: 0;
+}
+
+/* Paginação das filas: contagem à esquerda, Anterior/Próxima no meio, linhas por página à direita. */
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.paginacao__botoes,
+.paginacao__linhas {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.paginacao__botoes button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.paginacao__linhas select {
+  height: 1.875rem;
+  padding: 0 1.5rem 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+/* Filtros de rótulo pequeno em cima, numa linha (mesmo desenho de Comissões). */
+.filtros-compactos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.375rem;
+}
+
+.filtros-compactos label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.filtros-compactos label > span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.filtros-compactos select {
+  height: 1.875rem;
+  padding: 0 1.5rem 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+/* ─── Fila de comissões (Financeiro): paginada, com os totais do FILTRO no rodapé ─── */
+.fila-comissoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.detalhe__acoes {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ─── Topo das filas: "← Voltar" à esquerda, filtros à direita ─── */
+.fila__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.voltar-para {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem 0.375rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--surface);
+}
+
+.voltar-para:hover,
+.voltar-para:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.voltar-para > span {
+  font-size: 1rem;
+  line-height: 1;
+}
