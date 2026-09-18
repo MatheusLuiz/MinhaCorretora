@@ -1,0 +1,57 @@
+# Dependências
+node_modules/
+.pnp/
+.pnp.js
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Variáveis de ambiente — NUNCA versionar
+.env
+.env.*
+!.env.example
+
+# Segredos e chaves
+*.pem
+*.key
+*.p12
+secrets/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cobertura de testes
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.vite/
+.eslintcache
+
+# Sistema operacional
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editores
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# Dumps de banco locais
+database/dumps/
+*.sql.gz
+
+# Dados operacionais e PII importados. Nunca pertencem ao repositório.
+backend/armazenamento/
+backups/
