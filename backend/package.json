@@ -1,0 +1,69 @@
+{
+  "name": "minhacorretora-bi-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API do MinhaCorretora BI — autenticação, importação dos relatórios das seguradoras e painéis",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "db:criar-usuario": "tsx src/scripts/criar-usuario-banco.ts",
+    "db:migrate": "tsx src/scripts/migrate.ts",
+    "db:reconciliar": "tsx src/scripts/reconciliar-cadastro.ts",
+    "db:exportar-mascarados": "tsx src/scripts/exportar-mascarados.ts",
+    "db:veiculos-bradesco": "tsx src/scripts/veiculos-bradesco.ts",
+    "db:remover-mascarados": "tsx src/scripts/remover-mascarados.ts",
+    "db:zerar": "tsx src/scripts/zerar-dados.ts",
+    "db:seed:admin": "tsx src/scripts/seed-admin.ts",
+    "db:importar:clientes": "tsx src/scripts/importar-clientes.ts",
+    "db:importar:apolices": "tsx src/scripts/importar-apolices.ts",
+    "db:importar:financeiro": "tsx src/scripts/importar-financeiro.ts",
+    "db:cadastrar:de-apolices": "tsx src/scripts/cadastrar-clientes-de-apolices.ts",
+    "lint": "eslint src",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "db:conciliacao-cpf": "tsx src/scripts/conciliacao-cpf.ts",
+    "db:ponto": "tsx src/scripts/linha-do-tempo.ts ponto",
+    "db:pontos": "tsx src/scripts/linha-do-tempo.ts lista",
+    "db:voltar": "tsx src/scripts/linha-do-tempo.ts voltar",
+    "db:cancelamentos-porto": "tsx src/scripts/cancelamentos-porto.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.1",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jose": "^5.10.0",
+    "mysql2": "^3.24.4",
+    "nodemailer": "^10.0.10",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "@types/nodemailer": "^6.4.24",
+    "eslint": "^9.39.5",
+    "globals": "^17.12.0",
+    "pino-pretty": "^13.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.71.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
