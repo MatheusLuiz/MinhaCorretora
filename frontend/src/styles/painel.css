@@ -1,0 +1,866 @@
+/* ─── Painéis e gráficos. Cores de série validadas por script (docs/DESIGN-DADOS.md);
+   onde o contraste fica abaixo de 3:1, o gráfico leva rótulo direto ou tabela. ─── */
+
+:root {
+  /* Oito slots em ordem fixa, nunca cicla: uma 9ª série vira "Outros". */
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
+  --serie-3: #1baf7a;
+  --serie-4: #eda100;
+  --serie-5: #e87ba4;
+  --serie-6: #008300;
+  --serie-7: #4a3aa7;
+  --serie-8: #e34948;
+
+  --grade: color-mix(in srgb, var(--text) 10%, transparent);
+  --eixo-texto: var(--text-muted);
+
+  --bom: #087443;
+  --atencao: #8a5a00;
+  --critico: #b42318;
+}
+
+/* Os mesmos matizes re-escalonados para o escuro; declarados no media query e no [data-theme='dark']. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --serie-4: #c98500;
+    --serie-5: #d55181;
+    --serie-6: #008300;
+    --serie-7: #9085e9;
+    --serie-8: #e66767;
+
+    --bom: #3fc27f;
+    --atencao: #e0a33a;
+    --critico: #ff7b72;
+  }
+}
+
+:root[data-theme='dark'] {
+  --serie-1: #3987e5;
+  --serie-2: #d95926;
+  --serie-3: #199e70;
+  --serie-4: #c98500;
+  --serie-5: #d55181;
+  --serie-6: #008300;
+  --serie-7: #9085e9;
+  --serie-8: #e66767;
+
+  --bom: #3fc27f;
+  --atencao: #e0a33a;
+  --critico: #ff7b72;
+}
+
+/* ─────────────── Moldura ─────────────── */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* A coluna rola, não o <main>: a topbar sticky precisa estar DENTRO do elemento que rola. */
+.layout__coluna {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.layout__conteudo {
+  min-width: 0;
+}
+
+/* ─────────────── Barra superior ─────────────── */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.875rem;
+
+  /* Lido também pelo menu do usuário, para o painel abrir abaixo da borda da topbar. */
+  --topbar-padding: 0.625rem;
+
+  padding: var(--topbar-padding) 1.5rem;
+  min-height: 3.5rem;
+
+  background: var(--moldura);
+  border-bottom: 1px solid var(--border);
+}
+
+.pular-navegacao {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: 0 0 var(--radius) 0;
+}
+
+.pular-navegacao:focus {
+  left: 0;
+  top: 0;
+}
+
+.painel {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 3rem;
+  display: grid;
+  /* `minmax(0, 1fr)`, não `auto`: uma tabela larga esticaria a coluna inteira em vez de rolar por dentro. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+.painel__cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.painel__cabecalho h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.painel__cabecalho p {
+  margin: 0;
+}
+
+.aviso-ficticio {
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px dashed color-mix(in srgb, var(--atencao) 45%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--atencao) 7%, transparent);
+  font-size: 0.875rem;
+}
+
+/* ─────────────── Tiles ─────────────── */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.875rem;
+}
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.125rem;
+  /* O valor se mede pela largura do PRÓPRIO tile (container query). */
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.tile__rotulo {
+  margin: 0 0 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.tile__valor {
+  margin: 0;
+  /* Encolhe com o tile e, no limite, quebra: reticências esconderiam dígitos. */
+  font-size: clamp(1.125rem, 11.5cqi, 1.625rem);
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile__variacao {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile__variacao--bom    { color: var(--bom); }
+.tile__variacao--ruim   { color: var(--critico); }
+.tile__variacao--neutro { color: var(--text-muted); }
+
+.tile__descricao {
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+/* ─────────────── Cartões ─────────────── */
+
+.cartao {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.125rem 1.25rem 1.25rem;
+  min-width: 0;
+}
+
+.cartao--largo {
+  grid-column: 1 / -1;
+}
+
+.cartao__cabecalho {
+  margin-bottom: 1rem;
+}
+
+.cartao__cabecalho h2 {
+  margin: 0 0 0.125rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cartao__cabecalho p {
+  font-size: 0.8125rem;
+}
+
+.cartao__rodape {
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+/* ─────────────── Barras horizontais ─────────────── */
+
+.barras {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.barras__linha {
+  display: grid;
+  grid-template-columns: minmax(6rem, 9rem) 1fr auto 3rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.375rem;
+  border-radius: 7px;
+  font-size: 0.875rem;
+  transition: background-color 120ms ease;
+}
+
+.barras__linha:hover,
+.barras__linha--ativa,
+.barras__linha:focus-visible {
+  background: var(--bg);
+  outline: none;
+}
+
+.barras__categoria {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.barras__trilho {
+  height: 0.75rem;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barras__preenchimento {
+  display: block;
+  height: 100%;
+  background: var(--serie-1);
+  /* Arredondado só na ponta do dado; a base fica reta no eixo. */
+  border-radius: 0 4px 4px 0;
+  transition: inline-size 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.barras__valor {
+  font-variant-numeric: tabular-nums;
+  font-weight: 550;
+}
+
+.barras__participacao {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ─────────────── Gráfico de linha ─────────────── */
+
+/* text-anchor fica como atributo no JSX: CSS venceria o atributo de apresentação. */
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  /* Legenda em tinta de texto, nunca na cor da série. */
+  color: var(--text-muted);
+}
+
+.legenda li {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+}
+
+/* ─────────────── Tabela ─────────────── */
+
+.tabela-rolante {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.tabela th,
+.tabela td {
+  padding: 0.5625rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tabela th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.tabela tbody tr:hover {
+  background: var(--bg);
+}
+
+.tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela__mono {
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.etiqueta--critico   { color: var(--critico); }
+.etiqueta--atencao   { color: var(--atencao); }
+.etiqueta--tranquilo { color: var(--text-muted); }
+
+/* ─────────────── Estado vazio ─────────────── */
+
+.vazio {
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.vazio__icone {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.vazio h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.vazio p {
+  max-width: 34rem;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.vazio code {
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.875em;
+}
+
+@media (max-width: 720px) {
+  .painel {
+    padding: 1.25rem 1rem 2.5rem;
+  }
+
+  .barras__linha {
+    grid-template-columns: minmax(5rem, 7rem) 1fr auto;
+  }
+
+  .barras__participacao {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barras__preenchimento {
+    transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    /* A variável, não o padding: o menu do usuário continua abrindo abaixo da borda. */
+    --topbar-padding: 0.5rem;
+    padding-inline: 1rem;
+  }
+
+}
+
+/* ─────────────── Consulta de clientes ─────────────── */
+
+/* Rótulo só para leitor de tela: `clip-path`, porque `display: none` o tira da árvore de acessibilidade. */
+.sr-apenas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.barra-filtros {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.selecao-compacta {
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  max-width: 12rem;
+}
+
+.selecao-compacta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.tabela td > .etiqueta {
+  margin-left: 0.4375rem;
+  vertical-align: middle;
+}
+
+.etiqueta--vip {
+  color: var(--bom, var(--accent));
+}
+
+/* Linha clicável parece clicável e mostra o foco de teclado. */
+.tabela--clicavel tbody tr {
+  cursor: pointer;
+}
+
+.tabela--clicavel tbody tr:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Tipo de pessoa é CLASSIFICAÇÃO, não status: texto discreto, não `.etiqueta`; só a exceção ganha contorno. */
+.tipo-pessoa {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tipo-pessoa--juridica {
+  padding: 0.0625rem 0.375rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ─────────────── Importação de clientes ─────────────── */
+
+.modelos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+
+.modelo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modelo:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+
+.modelo:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modelo span { font-size: 0.8125rem; }
+
+/* Importação de relatórios: relatório, seguradora e arquivo lado a lado. */
+.linha-importacao {
+  grid-template-columns: minmax(10rem, 0.9fr) minmax(14rem, 1.5fr) minmax(12rem, 1.2fr);
+  align-items: start;
+  margin-top: 0.875rem;
+}
+
+/* Na linha, cada campo tem largura própria (sem o span de duas colunas do cadastro). */
+.linha-importacao .campo--largo { grid-column: auto; }
+
+@media (max-width: 760px) {
+  .linha-importacao { grid-template-columns: 1fr; }
+}
+
+.grade-form input[type='file'] {
+  padding: 0.3125rem 0.5rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.grade-form input[type='file']::file-selector-button {
+  margin-right: 0.625rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+/* Segundo controle do campo: o nome livre da companhia, quando o select está em "Outra". */
+.campo__extra {
+  margin-top: 0.375rem;
+}
+
+.campo__dica {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.barra-filtros--acoes {
+  margin: 0.875rem 0 0;
+}
+
+.observacoes {
+  margin: 0 0 0.875rem;
+  padding-left: 1.125rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.observacoes li + li { margin-top: 0.25rem; }
+
+.colunas-modelo .observacoes { margin: 0.5rem 0 0; }
+
+.colunas-modelo {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.colunas-modelo summary {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.colunas-modelo p {
+  margin: 0.5rem 0 0;
+  word-break: break-word;
+  color: var(--text-muted);
+}
+
+/* Ocupa o espaço do gráfico que substitui, para o painel não "pular" quando o dado chegar. */
+.pendente {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 9rem;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.pendente p { margin: 0; }
+
+.pendente__titulo {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pendente__quando {
+  margin-top: 0.25rem !important;
+  color: var(--accent);
+  font-size: 0.8125rem;
+}
+
+/* Situação do cliente: cores distintas para a varredura (cobrança, venda, histórico). */
+.situacao--inadimplente {
+  border-color: color-mix(in srgb, var(--critico) 55%, transparent) !important;
+  color: var(--critico) !important;
+}
+
+.situacao--prospecto {
+  border-color: color-mix(in srgb, var(--bom, var(--accent)) 55%, transparent) !important;
+  color: var(--bom, var(--accent)) !important;
+}
+
+.situacao--inativo {
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+/* ─────────────── Formulário de cadastro ─────────────── */
+
+.grade-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.campo--largo { grid-column: span 2; }
+
+@media (max-width: 640px) {
+  .campo--largo { grid-column: span 1; }
+}
+
+.grade-form .campo { margin-bottom: 0; }
+
+.grade-form input,
+.grade-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.grade-form input:focus-visible,
+.grade-form select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Borda além do `aria-invalid`: o aviso não depende só de cor; a mensagem diz o que houve. */
+.grade-form input[aria-invalid='true'] {
+  border-color: var(--critico);
+}
+
+.campo__erro,
+.campo__ok {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+}
+
+.campo__erro { color: var(--critico); }
+.campo__ok { color: var(--bom, var(--accent)); }
+
+.campo-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.campo-check input {
+  margin-top: 0.1875rem;
+  flex-shrink: 0;
+}
+
+/* Campo na tabela de pendências: menor, para a linha não crescer. */
+.entrada-pendencia {
+  width: 100%;
+  min-width: 11rem;
+  box-sizing: border-box;
+  padding: 0.3125rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.entrada-pendencia:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.entrada-pendencia:disabled {
+  opacity: 0.5;
+}
+
+.tabela--densa td .campo__dica {
+  white-space: normal;
+  max-width: 22rem;
+}
+
+/* Título da tela na topbar: ocupa o espaço livre e corta com reticências em vez de quebrar a barra. */
+.topbar__titulo {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar__titulo h1 {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar__titulo p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* No celular a topbar é estreita: fica só o título. */
+@media (max-width: 640px) {
+  .topbar__titulo p {
+    display: none;
+  }
+}
+
+/* Cabeçalho só com as ações (o título foi para a topbar). */
+.painel__cabecalho--so-acoes {
+  justify-content: flex-end;
+}
+
+/* Estica o corpo até a altura da linha da grade. */
+.cartao--esticado {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.cartao--esticado > .cartao__corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* "Comissão recebida": número centralizado na altura do cartão vizinho. */
+.comissao-recebida {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.comissao-recebida__valor {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cartão compacto (topo de Comissões): metade do respiro; a explicação vai no `title`. */
+.cartao--compacto {
+  padding: 0.5rem 0.875rem;
+}
+
+.cartao--compacto > .cartao__cabecalho {
+  margin-bottom: 0.25rem;
+}
+
+.cartao--compacto > .cartao__cabecalho h2 {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cartao--compacto > .cartao__cabecalho {
+  text-align: center;
+  /* O cabeçalho é flex com space-between (widgets.css): text-align sozinho não o centraliza. */
+  justify-content: center;
+}

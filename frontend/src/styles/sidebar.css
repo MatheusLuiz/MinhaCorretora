@@ -1,0 +1,325 @@
+/* ─── Barra lateral — só a largura anima; o rótulo encolhe (sem display:none) para animar junto ─── */
+
+:root {
+  --sidebar-largura-recolhida: 4.25rem;
+  --sidebar-largura-expandida: 16rem;
+  --sidebar-transicao: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  width: var(--sidebar-largura-recolhida);
+  height: 100vh;
+
+  background: var(--moldura);
+  border-right: 1px solid var(--border);
+
+  transition: width var(--sidebar-transicao);
+  overflow: hidden;
+}
+
+/* `:focus-within` cobre o teclado (que não dispara hover); --expandida cobre o botão de fixar. */
+.sidebar--expandida,
+.sidebar:focus-within {
+  width: var(--sidebar-largura-expandida);
+  box-shadow: 4px 0 16px rgb(0 0 0 / 6%);
+}
+
+/* Fixada, a barra ocupa espaço de verdade: nada de sombra de sobreposição. */
+.sidebar--fixada {
+  box-shadow: none;
+}
+
+/* ─────────────── Topo ─────────────── */
+
+.sidebar__topo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  min-height: 3.5rem;
+}
+
+/* A marca troca pelo logo por opacidade + largura, acompanhando a animação. */
+.sidebar__marca {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  object-fit: contain;
+  transition: opacity var(--sidebar-transicao);
+}
+
+.sidebar__logo {
+  height: 2.25rem;
+  width: 0;
+  object-fit: contain;
+  object-position: left center;
+  opacity: 0;
+  transition: opacity var(--sidebar-transicao), width var(--sidebar-transicao);
+}
+
+.sidebar__fixar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--sidebar-transicao), color 120ms ease;
+}
+
+.sidebar--expandida .sidebar__logo,
+.sidebar:focus-within .sidebar__logo {
+  width: 8.75rem;
+  opacity: 1;
+}
+
+.sidebar--expandida .sidebar__marca,
+.sidebar:focus-within .sidebar__marca {
+  display: none;
+}
+
+.sidebar--expandida .sidebar__fixar,
+.sidebar:focus-within .sidebar__fixar {
+  opacity: 1;
+}
+
+.sidebar--expandida .sidebar__fixar,
+.sidebar:focus-within .sidebar__fixar {
+  pointer-events: auto;
+}
+
+.sidebar__fixar:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.sidebar__fixar[aria-pressed='true'] {
+  color: var(--accent);
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+/* ─────────────── Lista ─────────────── */
+
+.sidebar__lista,
+.sidebar__submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar__lista {
+  flex: 1;
+  padding: 0.625rem 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Recolhida, a barra de rolagem viraria um traço estranho ao lado dos ícones. */
+  scrollbar-width: thin;
+}
+
+.sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  width: 100%;
+  padding: 0.5625rem 0.625rem;
+  margin-bottom: 0.125rem;
+
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+
+  font: inherit;
+  font-size: 0.9062rem;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.sidebar__link:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--text);
+}
+
+.sidebar__link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.sidebar__icone {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  /* Largura fixa = a do ícone recolhido: mantém a coluna de ícones alinhada na animação. */
+  width: 1.5rem;
+}
+
+.sidebar__rotulo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--sidebar-transicao), transform var(--sidebar-transicao);
+}
+
+.sidebar--expandida .sidebar__rotulo,
+.sidebar:focus-within .sidebar__rotulo {
+  opacity: 1;
+  transform: none;
+}
+
+/* A barra à esquerda sobrevive ao recolhimento: mostra a posição só com ícones. */
+.sidebar__link--ativo {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar__link--ativo::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 50%;
+  translate: 0 -50%;
+  width: 3px;
+  height: 1.375rem;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
+/* Grupo cujo filho está ativo: sinaliza o ramo sem competir com o item. */
+.sidebar__link--ramo-ativo {
+  color: var(--text);
+}
+
+/* ─────────────── Grupo / submenu ─────────────── */
+
+.sidebar__seta {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--sidebar-transicao), rotate 180ms ease;
+}
+
+.sidebar--expandida .sidebar__seta,
+.sidebar:focus-within .sidebar__seta {
+  opacity: 0.7;
+}
+
+.sidebar__seta--aberta {
+  rotate: 90deg;
+}
+
+.sidebar__submenu {
+  /* Linha vertical liga os filhos ao pai: com o recuo pequeno, seriam indistinguíveis. */
+  position: relative;
+  margin: 0.125rem 0 0.375rem;
+  padding-left: 1.5rem;
+}
+
+.sidebar__submenu::before {
+  content: '';
+  position: absolute;
+  left: 1.3125rem;
+  top: 0.25rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: var(--border);
+}
+
+.sidebar__link--filho {
+  padding-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.sidebar__link--filho.sidebar__link--ativo::before {
+  left: -1.1875rem;
+}
+
+/* ─────────────── Rodapé ─────────────── */
+
+.sidebar__rodape {
+  border-top: 1px solid var(--border);
+  padding: 0.625rem 0.5rem;
+}
+
+/* ─── Acessibilidade e ambientes sem hover ─── */
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Em toque não há hover: a barra fica sempre larga. */
+@media (hover: none) {
+  .sidebar {
+    width: var(--sidebar-largura-expandida);
+  }
+
+  .sidebar__rotulo {
+    opacity: 1;
+    transform: none;
+  }
+
+  .sidebar__seta {
+    opacity: 0.7;
+  }
+
+  .sidebar__fixar {
+    display: none;
+  }
+}
+
+/* Telas estreitas: vira uma faixa de ícones fixa, sem roubar a largura útil. */
+@media (max-width: 640px) {
+  .sidebar,
+  .sidebar--expandida {
+    width: var(--sidebar-largura-recolhida);
+    box-shadow: none;
+  }
+
+  .sidebar__fixar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar__rotulo,
+    .sidebar__seta,
+  .sidebar__fixar {
+    transition: none;
+  }
+}
