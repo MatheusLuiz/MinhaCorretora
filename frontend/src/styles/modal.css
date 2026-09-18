@@ -1,0 +1,2243 @@
+/* ─── Modal e configurações. O <dialog> nativo fica na camada superior: z-index aqui seria inútil ─── */
+
+.modal {
+  width: min(92vw, 44rem);
+  max-height: min(86vh, 48rem);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.modal--pequeno {
+  width: min(92vw, 26rem);
+}
+
+.modal--largo {
+  width: min(94vw, 62rem);
+}
+
+.modal::backdrop {
+  background: rgb(8 10 14 / 55%);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: modal-entrada 180ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .modal[open]::backdrop {
+    animation: fundo-entrada 180ms ease;
+  }
+}
+
+@keyframes modal-entrada {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    scale: 0.985;
+  }
+}
+
+@keyframes fundo-entrada {
+  from {
+    opacity: 0;
+  }
+}
+
+.modal__caixa {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+}
+
+.modal__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__cabecalho h2 {
+  margin: 0 0 0.125rem;
+  font-size: 1.0625rem;
+}
+
+.modal__cabecalho p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.modal__fechar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal__fechar:hover {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.modal__fechar:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modal__corpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* O corpo do modal rola na vertical e NUNCA na horizontal. */
+  overflow-x: hidden;
+}
+
+/* Margem interna do modal simples (Configurações e Personalizar desenham a própria). */
+.modal__conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.125rem 1.25rem 1.25rem;
+}
+
+/* ─────────────── Configurações: seções + conteúdo ─────────────── */
+
+.config {
+  display: grid;
+  /* minmax(0, 1fr), não 1fr: o mínimo `auto` impediria a coluna de encolher e criaria rolagem horizontal. */
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-height: 24rem;
+  /* O fundo da coluna mora aqui: na coluna sticky, a cor acabaria no último botão. */
+  background: linear-gradient(to right, var(--bg) 15rem, transparent 15rem);
+}
+
+/* Fixa ao rolar: quem rola é o corpo do modal. */
+.config__secoes {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.75rem;
+}
+
+.config__secao {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.6875rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.config__secao:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.config__secao:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* O padding compensa a borda do estado ativo, para o item não "pular". */
+.config__secao--ativa {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: calc(0.5rem - 1px) calc(0.6875rem - 1px);
+}
+
+.config__secao svg {
+  flex-shrink: 0;
+}
+
+/* Por classe: `.config__secao span` pegava também a etiqueta "em breve". */
+.config__secao-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.config__secao-texto strong {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.config__secao-texto small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.config__badge {
+  margin-left: auto;
+  align-self: center;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.config__conteudo {
+  padding: 1.125rem 1.25rem 1.25rem;
+  min-width: 0;
+  /* A divisória das seções: na coluna sticky ela terminaria no último botão. */
+  border-left: 1px solid var(--border);
+  /* Contém o que vaza na horizontal dentro da seção, em vez de empurrar o modal. */
+  overflow-x: hidden;
+}
+
+/* ─────────────── Painel de usuários ─────────────── */
+
+.usuarios__barra {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.campo-busca {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.campo-busca input {
+  width: 100%;
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.campo-busca input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.segmentado {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Serve para <button> e <a>: link herda sublinhado e cor que quebrariam a pílula. */
+.segmentado__opcao {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4375rem 0.6875rem;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segmentado__opcao:last-child {
+  border-right: 0;
+}
+
+.segmentado__opcao--ativa {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.botao--compacto {
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.875rem;
+  width: auto;
+}
+
+.usuarios__resumo {
+  margin: 0 0 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.tabela--densa th,
+.tabela--densa td {
+  padding: 0.5rem 0.625rem;
+}
+
+.tabela__linha--inativa {
+  opacity: 0.55;
+}
+
+.tabela__vazio {
+  padding: 2rem 0.625rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.usuarios__identidade {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.usuarios__identidade div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.usuarios__identidade small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.usuarios__avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.usuarios__voce {
+  margin-left: 0.375rem;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Tracejado sinaliza "clique para editar" sem um ícone de lápis por linha. */
+
+.seletor {
+  padding: 0.25rem 0.375rem;
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.etiqueta--ok {
+  color: var(--bom);
+}
+
+.nota-integracao {
+  margin: 0.875rem 0 0;
+  padding: 0.625rem 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.nota-integracao code {
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.vazio--compacto {
+  padding: 2.5rem 1.25rem;
+}
+
+/* ─────────────── E-mail de disparo ─────────────── */
+
+.config__titulo {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.formulario__acoes--esquerda {
+  justify-content: flex-start;
+  padding-top: 0;
+  margin-top: -0.375rem;
+  border-top: 0;
+}
+
+/* O span vazio ocupa o lugar do rótulo, alinhando o botão com o campo. */
+.config__teste {
+  justify-content: flex-end;
+}
+
+.config__teste > .botao {
+  align-self: flex-start;
+}
+
+.config__rodape {
+  margin-right: auto;
+  align-self: center;
+}
+
+/* `.abas` tem margem negativa embaixo e conta com o `gap` do contêiner. */
+.email {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.email__situacao {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.email__topo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.email__topo .config__titulo {
+  margin: 0;
+}
+
+.email__dica {
+  margin: -0.5rem 0 0;
+  font-size: 0.75rem;
+}
+
+.email .tabela td > .etiqueta {
+  margin-left: 0.375rem;
+}
+
+/* As variáveis viram botões: clicar insere no ponto do cursor. */
+.email__variaveis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+}
+
+.email__variavel {
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.email__variavel:hover,
+.email__variavel:focus-visible {
+  border-color: var(--accent);
+}
+
+.email__editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 0.875rem;
+  align-items: start;
+}
+
+.email__editor textarea {
+  min-height: 18rem;
+}
+
+.email__previa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+
+.email__previa-rotulo {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.email__previa-assunto {
+  margin: 0;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+/* O e-mail é sempre claro (é assim que chega): o quadro não segue o tema. */
+.email__previa-quadro {
+  width: 100%;
+  height: 22rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f3f4f6;
+}
+
+.vazio--compacto h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+  .config {
+    grid-template-columns: 1fr;
+    background: none;
+  }
+
+  .config__secoes {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .config__conteudo {
+    border-left: 0;
+  }
+
+  .config__secao small,
+  .config__badge {
+    display: none;
+  }
+}
+
+/* ─────────────── Ficha do usuário ─────────────── */
+
+.tabela--clicavel tbody tr {
+  cursor: pointer;
+}
+
+.tabela--clicavel tbody tr:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.usuarios__situacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.usuarios__situacao small {
+  width: 100%;
+  font-size: 0.6875rem;
+}
+
+.formulario__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.formulario__acoes {
+  justify-content: flex-end;
+}
+
+/* ─────────────── Formulário ─────────────── */
+
+.formulario {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.formulario__linha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.875rem;
+}
+
+/* Segundo formulário da mesma ficha, separado por uma linha. */
+.formulario__titulo {
+  margin: 0.375rem 0 -0.25rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9375rem;
+}
+
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+
+.campo-form > span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* "obrigatório" por extenso: asterisco não diz nada a quem usa leitor de tela. */
+.campo-form > span em {
+  margin-left: 0.375rem;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.campo-form input,
+.campo-form select,
+.campo-form textarea,
+.contato-linha input,
+.contato-linha select {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+/* Monoespaçada; a caixa cresce só para baixo. */
+.campo-form textarea {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 8rem;
+}
+
+/* Campo só de leitura (CPF/CNPJ na correção): apagado, sem cursor de texto. */
+.campo-form input:disabled,
+.campo-form select:disabled,
+.campo-form textarea:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.campo-form input:focus-visible,
+.campo-form select:focus-visible,
+.campo-form textarea:focus-visible,
+.contato-linha input:focus-visible,
+.contato-linha select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* `.campo-form small` é mais específica que `.campo__erro` e tirava a cor do aviso. */
+.campo-form .campo__erro {
+  color: var(--critico);
+}
+
+.campo-form .campo__ok {
+  color: var(--bom, var(--accent));
+}
+
+.cadastro-abas {
+  display: grid;
+  gap: 1rem;
+}
+
+.formulario__linha--endereco {
+  grid-template-columns: minmax(0, 3fr) minmax(6rem, 1fr);
+}
+
+.formulario__linha--cidade {
+  grid-template-columns: minmax(0, 3fr) minmax(5rem, 1fr);
+}
+
+.formulario__linha--cep {
+  grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
+  align-items: end;
+}
+
+.cep-situacao {
+  margin: 0;
+  padding-bottom: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cep-situacao--preenchido {
+  color: var(--bom);
+}
+
+.cep-situacao--falha {
+  color: var(--danger);
+}
+
+@media (max-width: 560px) {
+  .formulario__linha--endereco,
+  .formulario__linha--cidade,
+  .formulario__linha--cep {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Responsável de contato em duas linhas, com cabeçalho próprio para o "Remover". */
+.responsavel {
+  display: grid;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.responsavel__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+/* Link da documentação: o campo e o "abrir" lado a lado. */
+.campo-form__com-acao {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.campo-form__com-acao input {
+  flex: 1;
+}
+
+/* Credenciais com nome: nome | valor | remover, uma por linha. */
+.credenciais {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.credenciais__linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.credenciais__linha input {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+.credenciais__linha input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 560px) {
+  .credenciais__linha {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .credenciais__linha input:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+.campo-form small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.formulario__nota {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* ─────────────── Senha gerada ─────────────── */
+
+.senha-gerada {
+  padding: 1rem 1.125rem;
+  border: 1px solid color-mix(in srgb, var(--atencao) 45%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--atencao) 7%, transparent);
+}
+
+.senha-gerada h4 {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+}
+
+.senha-gerada__caixa {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.625rem;
+}
+
+.senha-gerada code {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  user-select: all;
+}
+
+.senha-gerada p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.senha-gerada__nota {
+  margin-top: 0.375rem;
+}
+
+.alerta--ok {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--bom) 40%, transparent);
+  background: color-mix(in srgb, var(--bom) 8%, transparent);
+}
+
+.alerta p {
+  margin: 0;
+}
+
+.alerta p + p {
+  margin-top: 0.25rem;
+}
+
+/* ─────────────── Regras de senha ─────────────── */
+
+.login__cartao--largo {
+  max-width: 28rem;
+}
+
+.regras-senha {
+  list-style: none;
+  margin: 0.4375rem 0 0;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.regras-senha li::before {
+  content: '○ ';
+}
+
+.regras-senha--ok {
+  color: var(--bom);
+}
+
+.regras-senha--ok::before {
+  content: '● ';
+}
+
+/* ─────────────── Ficha do usuário ─────────────── */
+
+.ficha {
+  display: grid;
+  gap: 1rem;
+}
+
+.ficha__topo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ficha__voltar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.ficha__voltar:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ficha__voltar:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ficha__avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.ficha__identidade {
+  flex: 1;
+  min-width: 0;
+}
+
+.ficha__identidade h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.ficha__identidade p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ficha__selos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* ─────────────── Abas ─────────────── */
+
+.abas {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: -0.25rem;
+}
+
+.abas__item {
+  position: relative;
+  padding: 0.5rem 0.875rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.abas__item:hover:not(:disabled) {
+  color: var(--text);
+}
+
+/* Aba que ainda não se aplica: visível, mas sem prometer clique. */
+.abas__item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* O rótulo não quebra: partido, descolaria a barra de destaque do texto. */
+.abas__item {
+  white-space: nowrap;
+}
+
+.abas__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.abas__item--ativa {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 1px abaixo para cobrir a borda do contêiner (sem linha dupla). */
+.abas__item--ativa::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent);
+}
+
+/* ─────────────── Blocos ─────────────── */
+
+.bloco {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+/* Ações que cortam acesso ganham borda de alerta. */
+.bloco--sensivel {
+  border-color: color-mix(in srgb, var(--critico) 28%, var(--border));
+}
+
+.bloco__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.bloco__cabecalho h4 {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.bloco__cabecalho p {
+  margin: 0.125rem 0 0;
+  font-size: 0.8125rem;
+}
+
+.bloco__acoes {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.bloco__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.botao--perigo {
+  border: 1px solid color-mix(in srgb, var(--critico) 45%, transparent);
+  background: color-mix(in srgb, var(--critico) 8%, transparent);
+  color: var(--critico);
+}
+
+.botao--perigo:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--critico) 14%, transparent);
+}
+
+/* ─────────────── Cartões de dado ─────────────── */
+
+.cartoes-dado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.625rem;
+}
+
+.cartao-dado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  min-width: 0;
+}
+
+.cartao-dado--largo {
+  grid-column: span 2;
+}
+
+.cartao-dado__rotulo {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.cartao-dado__valor {
+  font-size: 0.875rem;
+  word-break: break-word;
+}
+
+/* ─────────────── Lista de permissões ─────────────── */
+
+.lista-permissoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.lista-permissoes label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.lista-permissoes label:hover {
+  border-color: var(--border);
+}
+
+.lista-permissoes input {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.lista-permissoes input:disabled {
+  cursor: not-allowed;
+}
+
+.lista-permissoes__texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.lista-permissoes__texto strong {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.lista-permissoes__texto code {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.lista-permissoes__origem {
+  flex-shrink: 0;
+}
+
+/* Exceção marcada: distingue da permissão que vem do papel. */
+.lista-permissoes--excecao label {
+  border-color: color-mix(in srgb, var(--atencao) 40%, transparent);
+  background: color-mix(in srgb, var(--atencao) 6%, transparent);
+}
+
+.tag {
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag--papel {
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.tag--mais {
+  border: 1px solid color-mix(in srgb, var(--bom) 45%, transparent);
+  color: var(--bom);
+}
+
+.tag--menos {
+  border: 1px solid color-mix(in srgb, var(--critico) 45%, transparent);
+  color: var(--critico);
+}
+
+.campo-form--largo {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .cartao-dado--largo {
+    grid-column: span 1;
+  }
+
+  .ficha__selos {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* Produtores da carteira: duas colunas e rolagem própria, para não empurrar as ações. */
+.lista-carteira {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.25rem 1rem;
+  max-height: 18rem;
+  overflow-y: auto;
+  margin: 0.625rem 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.lista-carteira .campo-check {
+  margin-top: 0;
+  padding: 0.25rem 0;
+  font-size: 0.8125rem;
+}
+
+/* ─── Papéis e permissões: as permissões de um cargo abrem num modal próprio ─── */
+.papeis {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.papeis__busca {
+  width: min(100%, 22rem);
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+/* Papéis em colunas, uma linha curta cada; clicar abre as permissões num modal. */
+.papeis__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.papeis__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+
+  padding: 0.4375rem 0.75rem;
+
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.papeis__item-nome {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.papeis__item-total {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.papeis__item:hover {
+  border-color: var(--accent);
+}
+
+.papeis__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.papeis__detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.papeis__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Quantas pessoas a mudança atinge: em destaque de propósito. */
+.papeis__alcance {
+  flex-shrink: 0;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--critico);
+  background: color-mix(in srgb, var(--critico) 12%, transparent);
+  border-radius: 999px;
+}
+
+.papeis__permissoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.125rem 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Uma linha por permissão; chave e descrição na dica (`title`). */
+.papeis__permissao {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  padding: 0.3125rem 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.papeis__permissao:hover {
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.papeis__permissao input {
+  flex-shrink: 0;
+}
+
+.papeis__permissao > span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.papeis__permissao strong {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.papeis__selo {
+  flex-shrink: 0;
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--critico);
+  border: 1px solid color-mix(in srgb, var(--critico) 40%, transparent);
+  border-radius: 999px;
+}
+
+/* Rodapé do modal de permissões: papel à esquerda, salvar à direita; quebra no estreito. */
+.papeis__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--border);
+}
+
+.papeis__acoes-grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sócios da Receita, oferecidos como responsáveis de contato. */
+.socios-receita {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.socios-receita li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+/* Telefones e e-mails do cliente: tipo, valor, anotação, ações. */
+.contatos {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contatos + .contatos {
+  margin-top: 0.75rem;
+}
+
+.contatos__titulo {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.contato-linha {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 9rem) minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.contato-linha__acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  min-width: 9.5rem;
+}
+
+.contato-linha__principal {
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bom);
+}
+
+@media (max-width: 720px) {
+  .contato-linha {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .contato-linha__acoes {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}
+
+/* ── Tipos de seguro na ficha da seguradora: uma linha por tipo, detalhe na dica ── */
+.tipos-seguradora__busca {
+  width: min(100%, 22rem);
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.tipos-seguradora__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.375rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.tipos-seguradora__lista .campo-check {
+  margin-top: 0;
+  align-items: center;
+}
+
+.tipos-seguradora__lista .campo-check input {
+  margin-top: 0;
+}
+
+/* Barra da seção Tipos de seguro: busca, dois filtros e "Novo tipo". */
+.tipos-seguro__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tipos-seguro__barra select,
+.tipos-seguro__busca {
+  padding: 0.4375rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.tipos-seguro__busca {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.tipos-seguro__barra .botao {
+  margin-left: auto;
+}
+
+/* ── Tipos de seguro (Configurações): o nome é botão com cara de texto ── */
+.tipos-seguro__nome {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tipos-seguro__nome:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.tipos-seguro__nome:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tipos-seguro__voltar {
+  justify-self: start;
+}
+
+/* Detalhe do veículo, aberto dentro da tabela de apólices da ficha. */
+.ficha-veiculo {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.25rem 0 0.5rem;
+  white-space: normal;
+}
+
+.ficha-veiculo p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* Escolha de vários tipos de seguro, em forma de etiqueta. */
+.tipos-escolha {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.tipos-escolha legend {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tipos-escolha p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.tipos-escolha__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.tipos-escolha__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tipos-escolha__item input {
+  margin: 0;
+}
+
+.tipos-escolha__item--marcado {
+  border-color: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tipos-escolha__item:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Cotações (Clientes › Cotações). */
+.cotacoes__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.cotacoes__barra .segmentado {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.cotacoes__voltar {
+  justify-self: start;
+  margin-bottom: 0.75rem;
+}
+
+.cotacoes__subtitulo {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.cotacoes__proposta {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.cotacoes__situacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.cotacoes__encontrados {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cotacoes__encontrados button {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cotacoes__encontrados button:hover {
+  border-color: var(--accent);
+}
+
+/* Filtros no cabeçalho, à direita do título: poupa uma fileira de altura. */
+.filtros-pagamentos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.375rem;
+  /* Encosta à direita mesmo quando desce para a linha de baixo. */
+  margin-inline-start: auto;
+}
+
+.filtros-pagamentos label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.filtros-pagamentos label > span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.filtros-pagamentos select {
+  height: 1.875rem;
+  padding: 0 1.5rem 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+/* Duas colunas: título + gráfico | filtros + tabela (bordas alinhadas). Empilha no estreito. */
+.pagamentos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 960px) {
+  .pagamentos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pagamentos__grafico,
+.pagamentos__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.pagamentos__grafico h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  /* Mesma altura da fileira de filtros ao lado: gráfico e tabela começam na mesma linha. */
+  min-height: 2.75rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Filtros na largura da tabela: cada um estica por igual. */
+.pagamentos__lista .filtros-pagamentos {
+  flex-wrap: nowrap;
+  margin-inline-start: 0;
+  justify-content: stretch;
+}
+
+.pagamentos__lista .filtros-pagamentos label {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pagamentos__lista .filtros-pagamentos select {
+  width: 100%;
+}
+
+/* Rolagem só vertical; a altura é a que SOBRA na coluna (ver `.comissoes`). */
+.pagamentos__tabela {
+  flex: 1 1 0;
+  min-height: 8rem;
+  overflow: hidden auto;
+}
+
+/* `height` em tabela é mínimo: a sobra vai para a linha de respiro e os totais ficam no pé. */
+.pagamentos__tabela > .tabela {
+  height: 100%;
+}
+
+.pagamentos__tabela .tabela__respiro {
+  height: 100%;
+  cursor: default;
+}
+
+.pagamentos__tabela .tabela__respiro td {
+  padding: 0;
+  border: 0;
+}
+
+/* Linha clicável da tabela não pinta o respiro ao passar o mouse. */
+.pagamentos__tabela .tabela__respiro:hover td {
+  background: transparent;
+}
+
+/* `AreaDoGrafico` mede a área e converte para o viewBox; filho absoluto para não empurrar a medida. */
+.pagamentos__area-grafico {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 10rem;
+}
+
+.pagamentos__grafico-dentro {
+  position: absolute;
+  inset: 0;
+}
+
+/* ─── Telas que ocupam a altura da janela e crescem em F11 ───
+   `body.tela-ajustada` (posta pela página), não `:has()`: o Firefox ESR anterior ao 121 o ignora. */
+.tela-ajustada .layout__coluna {
+  display: flex;
+  flex-direction: column;
+}
+
+.tela-ajustada .topbar {
+  flex: none;
+}
+
+.tela-ajustada .layout__conteudo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Item flex em coluna com `margin: auto` encolheria para o conteúdo. */
+.tela-ajustada .layout__conteudo > .painel {
+  width: 100%;
+}
+
+.painel.comissoes,
+.painel.painel--tela {
+  flex: 1 1 auto;
+  /* Abaixo disso a tela rola, em vez de espremer gráfico e tabela. */
+  min-height: 36rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding-bottom: 1rem;
+}
+
+.comissoes > .cartao--largo,
+.painel--tela > .cartao--largo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.comissoes .pagamentos,
+.painel--tela .pagamentos {
+  flex: 1 1 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+/* O valor recebido fica estreito; as duas roscas levam o espaço. */
+.comissoes__topo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr);
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .painel.comissoes,
+  .painel.painel--tela {
+    min-height: 0;
+  }
+
+  .comissoes__topo,
+  .comissoes .pagamentos,
+  .painel--tela .pagamentos {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .pagamentos__area-grafico {
+    flex: none;
+    height: 16rem;
+  }
+
+  .pagamentos__tabela {
+    flex: none;
+    max-height: 20rem;
+  }
+}
+
+.pagamentos__tabela .tabela th,
+.pagamentos__tabela .tabela td {
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.pagamentos__tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
+/* O tfoot INTEIRO gruda embaixo, não cada célula (as três linhas se sobreporiam). */
+.pagamentos__tabela tfoot {
+  position: sticky;
+  bottom: 0;
+}
+
+.pagamentos__tabela tfoot th,
+.pagamentos__tabela tfoot td {
+  background: var(--surface);
+}
+
+/* Total no pé da tabela, SEM alinhamento próprio: herda o das colunas acima. */
+.tabela__total th,
+.tabela__total td {
+  border-top: 2px solid var(--border);
+  font-weight: 600;
+}
+
+.tabela__total th {
+  font-size: 0.875rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text);
+}
+
+/* ─── Dashboard de Renovações (minimalista, desenho próprio) ─── */
+
+.cartao__rodape {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* Faixa de números em cima; calendário largo e coluna com as roscas. Altura do `.painel--tela`. */
+.renovacoes__corpo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
+  gap: 1rem;
+}
+
+.renovacoes__calendario {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.renovacoes__calendario > .cartao__cabecalho {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.renovacoes__lado {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+/* O cartão fica na altura dele e rola por dentro, em vez de a página rolar. */
+.renovacoes__lado > .cartao {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 960px) {
+  .renovacoes__corpo {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ─── Aba Atendimentos da ficha: resumo, registro e linha do tempo ─── */
+.atendimentos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.atendimentos__resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem 1rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+}
+
+.atendimentos__resumo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-size: 0.8125rem;
+}
+
+.atendimentos__rotulo {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.atendimentos__novo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.atendimentos__canais {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.atendimentos__canal {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.atendimentos__canal--ativo {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  font-weight: 600;
+}
+
+.atendimentos__abrir {
+  margin-inline-start: auto;
+  font-size: 0.8125rem;
+}
+
+.atendimentos__campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem;
+}
+
+.atendimentos__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.atendimentos__filtro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.atendimentos__chip {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.atendimentos__chip--ativo {
+  border-color: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.atendimentos__linha-do-tempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atendimentos__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  border-inline-start: 3px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.atendimentos__icone {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.atendimentos__cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.atendimentos__descricao {
+  margin: 0.25rem 0;
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+}
+
+/* Seguradora do atendimento: com várias apólices ativas, seletor obrigatório em destaque. */
+.atendimentos__destino {
+  margin: 0;
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  font-size: 0.8125rem;
+}
+
+.atendimentos__destino-escolha select:invalid {
+  border-color: var(--atencao);
+}
+
+/* Papel inativo na lista: esmaecido, com "inativo" no lugar da contagem. */
+.papeis__item--inativo {
+  opacity: 0.6;
+}
+
+/* ── Tarefas agendadas: dias como pílulas marcáveis; mensagem do histórico em uma linha ── */
+.tarefas__dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tarefas__dias legend {
+  width: 100%;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.tarefas__dia {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3125rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* A caixa fica acessível ao teclado, mas invisível: a pílula é o controle. */
+.tarefas__dia input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tarefas__dia:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tarefas__dia--marcado {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tarefas__historico h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.tarefas__mensagem {
+  max-width: 22rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* `.abas` tem margem negativa e conta com o `gap` do contêiner. */
+.tarefas {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Log de uma execução de tarefa ──────────────────────────────────────── */
+.log-execucao__resumo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.log-execucao__mensagem {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.log-execucao__linhas {
+  max-height: 22rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.log-execucao__linha {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.1875rem 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.log-execucao__linha time {
+  color: var(--text-muted);
+}
+
+.log-execucao__linha--aviso {
+  color: var(--atencao);
+}
+
+.log-execucao__linha--erro {
+  color: var(--critico);
+  background: color-mix(in srgb, var(--critico) 8%, transparent);
+}
