@@ -1,0 +1,98 @@
+/* ─── Tokens e tema. Precedência: data-theme explícito > prefers-color-scheme > claro.
+   `:root:not([data-theme='light'])` faz o claro escolhido vencer um SO em modo escuro. ─── */
+
+/* Fundo e bordas puxam para o verde-água; barras na `--moldura`; só os cartões são brancos. */
+:root {
+  --bg: #e8f4f1;
+  --surface: #ffffff;
+  --moldura: #d9eee9;
+  --border: #c3e0d8;
+  --text: #16181d;
+  --text-muted: #565c66;
+  /* Verde da marca escurecido até 4.5:1 sobre a moldura; o puro fica em --marca-azul. */
+  --accent: #0b7466;
+  --accent-text: #ffffff;
+  --danger: #b42318;
+  --radius: 10px;
+
+  /* Cores da marca (as de public/logo.svg); não mudam com o tema. */
+  --marca-navy: #0f3b3a;
+  --marca-azul: #14a38b;
+  --marca-azul-claro: #2cc4a8;
+
+  color-scheme: light;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Valores escuros num lugar só, aplicados pelos dois seletores abaixo. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #101317;
+    --surface: #171b21;
+    --moldura: #171b21;
+    --border: #272c34;
+    --text: #e8eaed;
+    --text-muted: #9aa1ab;
+    --accent: #2bb8a0;
+    --accent-text: #0b0d10;
+    --danger: #ff7b72;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #101317;
+  --surface: #171b21;
+  --moldura: #171b21;
+  --border: #272c34;
+  --text: #e8eaed;
+  --text-muted: #9aa1ab;
+  --accent: #2bb8a0;
+  --accent-text: #0b0d10;
+  --danger: #ff7b72;
+}
+
+/* Rosa = tema CLARO com outra paleta (data-theme="light" junto), por isso o escuro do SO não o alcança. */
+:root[data-paleta='rosa'] {
+  color-scheme: light;
+
+  --bg: #fbe8ef;
+  --surface: #ffffff;
+  --moldura: #f8dbe7;
+  --border: #eec3d4;
+  --text: #2b1a22;
+  --text-muted: #6e4b5a;
+  --accent: #c2185b;
+  --accent-text: #ffffff;
+  --danger: #a8071a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  font: inherit;
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/marca.svg" />
+    <link rel="apple-touch-icon" href="/marca.svg" />
+    <meta name="theme-color" content="#0f3b3a" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Painel de indicadores da MinhaCorretora." />
+    <title>MinhaCorretora</title>
+    <!-- Aplica o tema salvo antes da primeira pintura (evita lampejo); localStorage pode lançar. -->
+    <script>
+      // Mesma chave e valores de src/lib/tema.ts — ao mudar um, mude o outro.
+      try {
+        var t = localStorage.getItem('minhacorretora:tema');
+        if (t === 'claro') document.documentElement.setAttribute('data-theme', 'light');
+        else if (t === 'escuro') document.documentElement.setAttribute('data-theme', 'dark');
+        // Rosa é o tema CLARO com outra paleta (ver aplicarTema em src/lib/tema.ts).
+        else if (t === 'rosa') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.setAttribute('data-paleta', 'rosa');
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
