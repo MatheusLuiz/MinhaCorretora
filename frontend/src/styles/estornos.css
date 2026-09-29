@@ -1,0 +1,233 @@
+/* Financeiro › Estornos: dois blocos com um "≠" entre eles — os totais não se somam. */
+
+.estornos__periodo {
+  margin: 0;
+}
+
+.estornos__blocos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+/* Texto à esquerda, mini série à direita, numa linha só; a nota vai no `title`. */
+.estornos__bloco {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.estornos__bloco:hover {
+  border-color: var(--accent);
+}
+
+.estornos__bloco:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* O bloco escolhido é o que a lista embaixo mostra. */
+.estornos__bloco--ativo {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.estornos__bloco-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.estornos__rotulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.estornos__total {
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.estornos__total--perda {
+  color: var(--danger);
+}
+
+/* "Não informada" não é número: menor e discreto, para não passar por apurado. */
+.estornos__total--pendente {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+}
+
+.estornos__legenda {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Mini série ao lado do total: decorativa, o valor exato está no title. */
+.estornos__serie {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.1875rem;
+  flex: 0 0 12rem;
+  height: 3rem;
+  margin: 0;
+}
+
+.estornos__coluna {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.estornos__barra {
+  display: block;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--text-muted);
+  opacity: 0.45;
+}
+
+.estornos__serie--perda .estornos__barra {
+  background-color: var(--danger);
+}
+
+.estornos__coluna--destaque .estornos__barra {
+  opacity: 1;
+}
+
+.estornos__mes {
+  margin-top: 0.125rem;
+  font-size: 0.625rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.estornos__nao-soma {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.estornos__nao-soma span {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.estornos__nao-soma small {
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.estornos__nao-soma {
+  cursor: help;
+}
+
+.estornos__titulo-lista {
+  flex: none;
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+/* A lista leva a altura que sobra e a tabela rola por dentro, com cabeçalho fixo. */
+.estornos__lista {
+  padding: 0.75rem 1rem;
+}
+
+.estornos__lista > .tabela-rolante {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.estornos__lista > .tabela-rolante thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
+.estornos__lista > .paginacao {
+  flex: none;
+}
+
+/* O total gruda no pé do cartão (mesmo desenho da tabela de Comissões). */
+.estornos__lista > .tabela-rolante > .tabela {
+  height: 100%;
+}
+
+.estornos__lista .tabela__respiro {
+  height: 100%;
+  cursor: default;
+}
+
+.estornos__lista .tabela__respiro td {
+  padding: 0;
+  border: 0;
+}
+
+.estornos__lista .tabela__respiro:hover td {
+  background: transparent;
+}
+
+.estornos__lista > .tabela-rolante tfoot {
+  position: sticky;
+  bottom: 0;
+}
+
+.estornos__lista > .tabela-rolante tfoot th,
+.estornos__lista > .tabela-rolante tfoot td {
+  background: var(--surface);
+}
+
+.estornos__motivo {
+  font-weight: 600;
+}
+
+.estornos__link {
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+@media (max-width: 960px) {
+  .estornos__lista > .tabela-rolante {
+    flex: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .estornos__blocos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .estornos__serie {
+    flex-basis: 8rem;
+  }
+
+  .estornos__nao-soma {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,68 @@
+/* ─── Dashboard de Seguradoras (prefixo `seguradoras__`; cores só por tokens) ─── */
+
+.seguradoras__legenda {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* A lista cresce na altura que sobra e rola por dentro; `min-height: 0` deixa o item flex encolher. */
+.painel--tela > .seguradoras__lista {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.seguradoras__lista {
+  padding: 0;
+  overflow: auto;
+}
+
+.seguradoras__tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.seguradoras__tabela td {
+  padding-block: 0.75rem;
+  vertical-align: middle;
+}
+
+.seguradoras__nome {
+  font-weight: 700;
+}
+
+/* Barra do peso + o percentual ao lado: comparação de relance, linha a linha. */
+.seguradoras__fatia {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.seguradoras__barra {
+  flex: none;
+  width: 8rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.seguradoras__barra > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.seguradoras__pendentes {
+  color: var(--critico);
+  font-weight: 600;
+}
+
+@media (max-width: 60rem) {
+  .seguradoras__barra {
+    width: 4rem;
+  }
+}

@@ -1,0 +1,107 @@
+/* Financeiro › Conciliação. Cores só pelos tokens de status de `painel.css` (têm versão escura). */
+
+.conciliacao__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.conciliacao__nota {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* Grade mês × seguradora: a célula é um botão, para o teclado alcançar a gaveta. */
+.conciliacao__grade th[scope='row'] {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.conciliacao__celula {
+  padding: 0.25rem 0.375rem;
+  text-align: right;
+}
+
+.conciliacao__celula--vazia {
+  text-align: center;
+}
+
+/* Fora da situação escolhida: continua à vista, mas recua. */
+.conciliacao__celula--apagada {
+  opacity: 0.35;
+}
+
+.conciliacao__botao {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 9rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.conciliacao__botao:hover {
+  border-color: var(--border);
+  background: var(--bg);
+}
+
+.conciliacao__botao:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.conciliacao__valor {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Selo: texto E borda carregam a situação, nunca só a cor. */
+.conciliacao__selo {
+  display: inline-block;
+  padding: 0.0625rem 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.conciliacao__selo--conferido,
+.conciliacao__selo--ordem-conferida {
+  color: var(--bom);
+}
+
+.conciliacao__selo--divergente,
+.conciliacao__selo--ordem-divergente,
+.conciliacao__selo--ordem-faltando {
+  color: var(--critico);
+}
+
+.conciliacao__selo--sem_recebimento,
+.conciliacao__selo--ordem-sobrando {
+  color: var(--atencao);
+}
+
+.conciliacao__cabecalho-ret {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .conciliacao__botao {
+    min-width: 7.5rem;
+  }
+}

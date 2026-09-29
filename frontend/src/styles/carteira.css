@@ -1,0 +1,312 @@
+/* Dashboard de Clientes e Fila de cadastro. `.carteira__corpo` leva a altura que sobra do `.painel--tela`. */
+
+/* ─────────────── A base de clientes, por grupo ─────────────── */
+
+.carteira__bases {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.carteira__base {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.carteira__base-nome {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.carteira__base-numeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.carteira__base-numeros > span {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+}
+
+.carteira__base-numeros strong {
+  font-size: 1.375rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.carteira__base-numeros small {
+  font-size: 0.75rem;
+}
+
+/* Entradas do mês | sem nenhum contato, lado a lado; empilham no celular. */
+.carteira__faixa {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: 0.75rem;
+}
+
+/* ─────────────── Número de destaque ─────────────── */
+
+.carteira__destaque {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.carteira__destaque:hover,
+.carteira__destaque:focus-visible {
+  border-color: var(--accent);
+}
+
+/* Alerta pela borda e pelo número; o texto diz o mesmo sem depender da cor. */
+.carteira__destaque--alerta {
+  border-color: color-mix(in srgb, var(--critico) 40%, var(--border));
+  background: color-mix(in srgb, var(--critico) 5%, var(--surface));
+}
+
+.carteira__destaque-valor {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.carteira__destaque--alerta .carteira__destaque-valor {
+  color: var(--critico);
+}
+
+.carteira__destaque-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.carteira__destaque-texto strong {
+  font-size: 1rem;
+}
+
+.carteira__destaque-acao {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ─────────────── Corpo: rosca | barras ─────────────── */
+
+.carteira__corpo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  /* Sem a série (backend anterior), as duas colunas que sobram dividem a largura. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  /* A linha fica na altura do corpo, não do conteúdo: senão a tela passava a rolar. */
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.carteira__situacao,
+.carteira__entradas,
+.carteira__qualidade {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.carteira__situacao > .cartao__cabecalho,
+.carteira__entradas > .cartao__cabecalho,
+.carteira__qualidade > .cartao__cabecalho {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.carteira__botao-fila {
+  min-width: 5.5rem;
+  justify-content: center;
+  padding-inline: 1.25rem;
+}
+
+/* A área que a rosca mede para escolher o próprio tamanho. */
+.carteira__rosca {
+  flex: 1 1 0;
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.carteira__rosca .rosca__legenda {
+  font-size: 0.9375rem;
+}
+
+.carteira__atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+/* Compactas para caber num notebook; se faltar altura, rola DENTRO do cartão. */
+.carteira__barras {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.carteira__barra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'rotulo numero'
+    'trilho trilho';
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  width: 100%;
+  padding: 0.3125rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.carteira__barra:hover:not(:disabled),
+.carteira__barra:focus-visible {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+}
+
+/* Completo não tem fila a abrir: sem cursor de mão, sem promessa de clique. */
+.carteira__barra:disabled {
+  cursor: default;
+}
+
+.carteira__barra-rotulo {
+  grid-area: rotulo;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carteira__barra-numero {
+  grid-area: numero;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.carteira__barra-numero strong {
+  font-size: 1rem;
+}
+
+.carteira__barra-numero .texto-discreto {
+  font-size: 0.75rem;
+}
+
+.carteira__barra-trilho {
+  grid-area: trilho;
+  display: block;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.carteira__barra-preenchido {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.carteira__barra--bom .carteira__barra-preenchido { background: var(--bom); }
+.carteira__barra--atencao .carteira__barra-preenchido { background: var(--atencao); }
+.carteira__barra--critico .carteira__barra-preenchido { background: var(--critico); }
+
+@media (max-width: 960px) {
+  .carteira__corpo {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+  }
+
+  .carteira__barras {
+    flex: none;
+  }
+
+  .carteira__rosca {
+    flex: none;
+    min-height: 12rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .carteira__destaque {
+    flex-wrap: wrap;
+  }
+
+  .carteira__destaque-acao {
+    margin-left: 0;
+  }
+}
+
+/* ─────────────── Fila de cadastro ─────────────── */
+
+.carteira__busca {
+  height: 1.875rem;
+  min-width: 14rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.carteira__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
