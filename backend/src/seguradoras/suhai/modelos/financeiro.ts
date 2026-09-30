@@ -1,0 +1,162 @@
+import type { LayoutFinanceiro } from '../../../services/modelosFinanceiro.js';
+
+export const SUHAI_PARCELAS_PENDENTES: LayoutFinanceiro = {
+  chave: 'suhai-parcelas-pendentes',
+  nome: 'Suhai — Parcelas pendentes corretor',
+  seguradoraChave: 'suhai',
+  seguradora: 'Suhai',
+  entidade: 'parcelas',
+  descricao:
+    'Parcelas em aberto na data da extração, com vencimento e dias de atraso. É a origem da inadimplência da Suhai.',
+  // Sem `statusPadrao`: "pendente" inclui o que vence HOJE; `nr_dias_atraso` decide linha a linha.
+  aliases: {
+    cd_apolice: 'numero_apolice',
+    nr_endosso: 'sequencia_emissao',
+    nm_pessoa_sub: 'nome_segurado',
+    nr_parcela: 'numero_parcela',
+    dt_vencimento: 'vencimento',
+    vl_total: 'valor',
+    nm_forma_pagamento: 'forma_pagamento',
+    nr_dias_atraso: 'dias_atraso',
+    filial: 'ignorar_filial',
+    cd_susep_re: 'ignorar_susep',
+    id_pessoa: 'ignorar_id_corretor',
+    nm_pessoa_corretor: 'ignorar_corretor',
+    dt_inicio_vigencia: 'ignorar_inicio_vigencia',
+    dt_fim_vigencia: 'ignorar_fim_vigencia',
+    nm_moeda: 'ignorar_moeda',
+  },
+  observacoes: [
+    'O arquivo começa por um preâmbulo (empresa, título, período). A leitura procura o cabeçalho pelo conteúdo.',
+    'Não traz status: 0 dia de atraso entra como ABERTA (vence hoje), mais que isso como ATRASADA.',
+    'Não traz CPF. A parcela se liga ao cliente pela apólice, que deve ter vindo antes pelo relatório de emissões.',
+    '"nm_pessoa_sub" é o SEGURADO, apesar do nome — conferido contra a base.',
+  ],
+};
+
+export const SUHAI_COMISSOES_RECIBOS: LayoutFinanceiro = {
+  chave: 'suhai-comissoes-recibos',
+  nome: 'Suhai — Recibos de comissão',
+  seguradoraChave: 'suhai',
+  seguradora: 'Suhai',
+  entidade: 'comissoes',
+  descricao:
+    'Um recibo por pagamento, com bruto, IRRF, ISS, INSS e líquido. Cobre o período inteiro da extração num arquivo só.',
+  competenciaPeloPagamento: true,
+  reciboAnoBarraNumero: true,
+  aliases: {
+    nm_pessoa: 'corretora',
+    // A chave única inclui o estabelecimento e NULL não conta como repetição: a SUSEP constante evita duplicar.
+    cd_susep_re: 'codigo_estabelecimento',
+    nr_recibo: 'numero',
+    vl_bruto: 'total_bruto',
+    dt_pagto: 'pago_em',
+    vl_irrf: 'irrf',
+    vl_iss: 'iss',
+    vl_inss: 'inss',
+    vl_liquido: 'total_liquido',
+    id_pessoa: 'ignorar_id_corretor',
+  },
+  observacoes: [
+    'O arquivo começa por um preâmbulo (período, empresa, data). A leitura procura o cabeçalho pelo conteúdo.',
+    'A competência de cada recibo é o mês do pagamento — o arquivo cobre vários meses.',
+    'Os recibos 1 a 12 de cada ano chegam como data (2026/6 vira 01/06/2026). A importação desfaz.',
+    'É o total de cada pagamento, sem apólice nem segurado: não dá para dizer de quem é cada comissão.',
+    'NÃO importe junto com o demonstrativo do mesmo mês: são os mesmos pagamentos, com identificação diferente, e somariam em dobro.',
+  ],
+};
+
+/** Lido por `importacaoDemonstrativoComissao.service.ts` (três blocos com rótulos próprios, sem aliases). */
+export const SUHAI_COMISSOES_DEMONSTRATIVO: LayoutFinanceiro = {
+  chave: 'suhai-comissoes-demonstrativo',
+  nome: 'Suhai — Demonstrativo de comissão (um por pagamento)',
+  seguradoraChave: 'suhai',
+  seguradora: 'Suhai',
+  entidade: 'comissoes',
+  descricao:
+    'Um pagamento por arquivo, com a comissão de cada parcela: apólice, segurado, % e valor. Estorno e cancelamento vêm negativos.',
+  aliases: {},
+  observacoes: [
+    'UM arquivo por pagamento: um mês tem vários. São uma importação cada.',
+    'A soma das linhas é conferida contra o bruto do rodapé — diferença de um centavo recusa o arquivo.',
+    'Não traz o número do recibo: o pagamento é identificado pelo id das linhas. Reimportar (em qualquer formato) atualiza, não duplica.',
+    'Não traz o prêmio — a coluna "vl_parcela" é a comissão da parcela.',
+    'A comissão se liga à apólice pelo número. Apólice que ainda não está na base entra sem vínculo.',
+    'NÃO importe junto com o relatório de recibos do mesmo mês: os pagamentos somariam em dobro.',
+  ],
+};
+
+export const SUHAI_SINISTROS: LayoutFinanceiro = {
+  chave: 'suhai-sinistros',
+  nome: 'Suhai — Sinistros, assistências e RCF',
+  seguradoraChave: 'suhai',
+  seguradora: 'Suhai',
+  entidade: 'sinistros',
+  descricao:
+    'Um acionamento por linha — colisão, RCF ou assistência 24h —, com data, cobertura, status e reserva. O portal exporta um arquivo por tipo; o layout lê os três.',
+  aliases: {
+    no_sinistro: 'numero_sinistro',
+    no_apolice: 'numero_apolice',
+    sinistrado: 'nome_segurado',
+    ramo: 'ramo',
+    // "Cobertura" e "Causa" vêm duas vezes (texto e código): a primeira, de texto, vence.
+    cobertura: 'cobertura',
+    causa: 'causa',
+    dt_ocorrencia: 'ocorrido_em',
+    dt_comunicacao: 'comunicado_em',
+    status_do_processo: 'status_processo',
+    status_pelo_movimento: 'status_movimento',
+    reserva: 'reserva',
+    reserva_r_o: 'reserva_ro',
+    placa_do_veiculo_segurado: 'placa',
+    item: 'veiculo',
+
+    // Dados do TERCEIRO do RCF não são gravados (gente sem relação com a corretora).
+    nome_terceiro: 'ignorar_terceiro_nome',
+    cnpj_cpf_terceiro: 'ignorar_terceiro_documento',
+    placa_veiculo_terceiro: 'ignorar_terceiro_placa',
+    placa_do_veiculo_terceiro: 'ignorar_terceiro_placa',
+    chassi_veiculo_terceiro: 'ignorar_terceiro_chassi',
+    item_terceiro: 'ignorar_terceiro_veiculo',
+
+    cliente: 'ignorar_cliente',
+    no_contrato: 'ignorar_contrato',
+    empresa: 'ignorar_empresa',
+    no_evento: 'ignorar_evento',
+    ajusta_recuperacao_de_resseguro: 'ignorar_resseguro',
+    no_sub: 'ignorar_sub',
+    no_endosso: 'ignorar_endosso',
+    no_sinistro_pai: 'ignorar_sinistro_pai',
+    usuario: 'ignorar_usuario',
+    codigo_do_endosso: 'ignorar_codigo_endosso',
+    dt_inicial_ocorrencia: 'ignorar_inicio_ocorrencia',
+    dt_final_ocorrencia: 'ignorar_fim_ocorrencia',
+    hora_da_ocorrencia: 'ignorar_hora',
+    dt_ocorrencia_filtro: 'ignorar_ocorrencia_filtro',
+    no_do_sinistro_lider: 'ignorar_sinistro_lider',
+    sub: 'ignorar_sub_item',
+    nome_da_tabela_itens: 'ignorar_tabela_itens',
+    pessoa: 'ignorar_pessoa',
+    produto: 'ignorar_produto',
+    data_de_expiracao: 'ignorar_expiracao',
+    qtd_dias_expir: 'ignorar_dias_expiracao',
+    prazo: 'ignorar_prazo',
+    dv_regra_753: 'ignorar_regra',
+    dv_sinistros_vinculados: 'ignorar_vinculados',
+    numero_de_aviso_de_sinistro_central_atend: 'ignorar_aviso_central',
+    dv_hierarquia: 'ignorar_hierarquia',
+    gerou_resseguro: 'ignorar_gerou_resseguro',
+    nr_item: 'ignorar_nr_item',
+    condicao_acao_tela_sinistro_resseguro: 'ignorar_condicao_tela',
+    dv_regra_110206: 'ignorar_regra_110206',
+    dv_colisao_fluxo: 'ignorar_colisao_fluxo',
+    dv_regra_112165: 'ignorar_regra_112165',
+  },
+  observacoes: [
+    'O portal separa em três arquivos (colisão, assistência e RCF) com o mesmo cabeçalho. Importe os três pelo mesmo layout.',
+    'Assistência 24h entra como ASSISTÊNCIA, não como sinistro — senão metade da carteira pareceria sinistrada.',
+    'Os dados do TERCEIRO no RCF (nome, CPF, placa, chassi) não são gravados.',
+    'Não traz valor pago, só a reserva do sinistro em aberto: dá frequência, ainda não sinistralidade.',
+    'Acionamento de apólice que não está na base é guardado mesmo assim, e se liga quando a apólice chegar.',
+  ],
+};
