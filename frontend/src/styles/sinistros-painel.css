@@ -1,0 +1,103 @@
+/* ─── Dashboard de Sinistros. O aviso de cobertura vem logo abaixo dos números: sem ele, o zero se lê errado ─── */
+
+.sinistros-painel__corpo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 26rem);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.sinistros-painel__numeros,
+.sinistros-painel__aviso {
+  grid-column: 1 / -1;
+}
+
+.sinistros-painel__numeros {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.sinistros-painel__numeros > .tile {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.sinistros-painel__numeros .tile__descricao {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sinistros-painel__aviso {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.sinistros-painel__serie,
+.sinistros-painel__bloco {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sinistros-painel__lado {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.sinistros-painel__bloco {
+  flex: 1 1 0;
+}
+
+.sinistros-painel__lista {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Widgets da Visão geral: os mesmos números, em grade que se ajusta. */
+.sinistros-widget__numeros .sinistros-painel__numeros {
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.sinistros-widget__grafico {
+  height: 16rem;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1100px) {
+  .sinistros-painel__numeros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Tela estreita: empilha, e a altura volta a ser a do conteúdo. */
+@media (max-width: 960px) {
+  .sinistros-painel__corpo {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .sinistros-painel__numeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sinistros-painel__serie .pagamentos__area-grafico {
+    flex: none;
+    height: 16rem;
+  }
+
+  .sinistros-painel__bloco,
+  .sinistros-painel__lista {
+    flex: none;
+    overflow: visible;
+  }
+}
