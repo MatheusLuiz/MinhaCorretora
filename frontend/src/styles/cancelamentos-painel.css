@@ -1,0 +1,112 @@
+/* ─── Dashboard de Cancelamentos. O aviso de cobertura evita ler o zero como "ninguém cancelou" ─── */
+
+.cancelamentos-painel__corpo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 26rem);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.cancelamentos-painel__numeros,
+.cancelamentos-painel__aviso {
+  grid-column: 1 / -1;
+}
+
+.cancelamentos-painel__numeros {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.cancelamentos-painel__numeros > .tile {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.cancelamentos-painel__aviso {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.cancelamentos-painel__serie,
+.cancelamentos-painel__bloco {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cancelamentos-painel__tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.cancelamentos-painel__tabela th,
+.cancelamentos-painel__tabela td {
+  padding: 0.5rem 0.375rem;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+.cancelamentos-painel__tabela thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.cancelamentos-painel__tabela tbody th {
+  text-align: left;
+  font-weight: 600;
+}
+
+.cancelamentos-painel__tabela tbody th .texto-discreto {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.cancelamentos-painel__tabela tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+.cancelamentos-painel__numero {
+  padding: 0.125rem 0.375rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cancelamentos-painel__numero:hover,
+.cancelamentos-painel__numero:focus-visible {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+@media (max-width: 1100px) {
+  .cancelamentos-painel__numeros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Tela estreita: empilha, e a altura volta a ser a do conteúdo. */
+@media (max-width: 960px) {
+  .cancelamentos-painel__corpo {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .cancelamentos-painel__numeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cancelamentos-painel__serie .pagamentos__area-grafico {
+    flex: none;
+    height: 16rem;
+  }
+}
