@@ -1,4 +1,4 @@
-# MinhaCorretora — BI para corretora de seguros
+# MinhaCorretora — para corretora de seguros
 
 Painel web de indicadores para uma corretora de seguros: carteira de clientes,
 apólices, parcelas, comissões, renovações, cancelamentos e sinistros, com
@@ -15,29 +15,6 @@ importação dos relatórios das seguradoras.
 | Frontend   | React 19 · TypeScript · Vite 6                       |
 | Banco      | MySQL 8.4 LTS                                        |
 | Integração | Relatórios das seguradoras (xlsx/xls/csv/PDF)          |
-
-## Estrutura
-
-```
-MinhaCorretora/
-├── backend/            API Express + TypeScript
-│   └── src/
-│       ├── config/         variáveis de ambiente (validadas com Zod) e logger
-│       ├── routes/         endpoints
-│       ├── controllers/    HTTP ↔ domínio
-│       ├── services/       regras de negócio e motor de importação
-│       ├── repositories/   acesso ao MySQL — ÚNICO lugar com SQL
-│       ├── seguradoras/    um diretório por companhia (layouts, leitores, API, tarefas)
-│       ├── middlewares/    segurança, autenticação, validação, erros
-│       ├── scripts/        migrations, seeds e rotinas de linha de comando
-│       └── utils/          utilitários compartilhados
-├── frontend/           SPA React (dashboards, filas de trabalho, configurações)
-├── database/
-│   ├── migrations/     evolução do schema, em ordem numérica
-│   ├── seeds/          papéis, permissões e configuração base
-│   └── security/       usuários de banco com privilégio mínimo
-└── docs/               arquitetura, modelo de dados, segurança
-```
 
 ## Como rodar localmente
 
@@ -111,12 +88,4 @@ npm run dev               # http://localhost:5173
 - [Backend](backend/README.md) · [Frontend](frontend/README.md) · [Banco](database/README.md)
 - [Código por seguradora](backend/src/seguradoras/LEIA-ME.md)
 
-## Publicando no GitHub
 
-O repositório já vem inicializado no branch `main`. Crie um repositório
-**vazio** no GitHub (sem README e sem .gitignore) e rode:
-
-```bash
-git remote add origin https://github.com/<seu-usuario>/MinhaCorretora.git
-git push -u origin main
-```
